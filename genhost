@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+#
+# genhost - generate unused hostnames by randomly picking from a word list
+#
+
+readonly wordlist='wordlist'
+readonly domain='example.com'
+
+# http://mywiki.wooledge.org/BashFAQ/026
+
+# returns random number from 0 to ($1-1) in global var 'r'.
+rand() {
+  local max=$((32768 / $1 * $1))
+  while (( (r=$RANDOM) >= max )); do :; done
+  r=$(( r % $1 ))
+}
+
+# check for a positive integer argument
+if [[ -z $1 ]]; then
+  echo 'Usage: genhost <integer>'
+  echo 'Generate unused hostnames by randomly picking from a word list'
+  exit 1
+else
+  if [[ $1 == *[!0-9]* ]]; then
+    echo "'$1' is not a positive integer"
+    exit 1
+  fi
+fi
+
+# read the word list into memory, removing commented words
+unset lines n
+while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
+
+# output the random hostname(s)
+for i in $(seq $1); do
+  # pick a random available word
+  rand $n
+  echo "${lines[r]}.${domain}"
+
+  # mark the word as used in the word list
+  case $OSTYPE in
+    darwin*)
+      /usr/bin/sed -i '' "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
+      ;;
+    linux*)
+      /usr/bin/sed -i "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
+      ;;
+  esac
+done
+
+exit 0
