@@ -41,10 +41,10 @@ for i in $(seq $1); do
   # mark the word as used in the word list
   case $OSTYPE in
     darwin*)
-      /usr/bin/sed -i '' "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
+      sed -i '' "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
       ;;
     linux*)
-      /usr/bin/sed -i "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
+      sed -i "s/${lines[r]}/#${lines[r]}/g" "$wordlist"
       ;;
   esac
 done
