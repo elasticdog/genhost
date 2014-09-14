@@ -31,6 +31,8 @@ fi
 # read the word list into memory, removing commented words
 unset lines n
 while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
+# since $n gets incremented even by the EOF character, remove 1 from n
+n=$(( n - 1 ))
 
 # output the random hostname(s)
 for i in $(seq $1); do
