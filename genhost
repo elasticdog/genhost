@@ -49,6 +49,18 @@ for i in $(seq $1); do
       sed -i "/^${lines[r]}\$/ s/^/#/" "$wordlist"
       ;;
   esac
+
+  # filter the word list to avoid outputting the same hostname twice in one
+  # session
+  m=0
+  unset lines_new
+  for (( j = 0 ; j < n ; j++)); do
+    if [ $j -ne $r ]; then
+      lines_new[$((m++))]=${lines[j]}
+    fi
+  done
+  lines=("${lines_new[@]}")
+  n=$m
 done
 
 exit 0
