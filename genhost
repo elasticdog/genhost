@@ -18,12 +18,12 @@ rand() {
 
 # check for a positive integer argument
 if [[ -z $1 ]]; then
-  echo 'Usage: genhost <integer>'
-  echo 'Generate unused hostnames by randomly picking from a word list'
+  printf 'Usage: genhost <integer>\n'
+  printf 'Generate unused hostnames by randomly picking from a word list\n'
   exit 1
 else
   if [[ $1 == *[!0-9]* ]]; then
-    echo "'$1' is not a positive integer" >&2
+    printf 'genhost: "%d" is not a positive integer\n' "$1" >&2
     exit 1
   fi
 fi
@@ -38,13 +38,13 @@ while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
 # output the random hostname(s)
 for i in $(seq $1); do
   if [[ $n -eq 0 ]]; then
-    echo "no more available hostnames left in file $wordlist" >&2
+    printf 'genhost: no more available hostnames left in file %s\n' "$wordlist" >&2
     exit 1
   fi
 
   # pick a random available word
   rand $n
-  echo "${lines[r]}.${domain}"
+  printf '%s.%s\n' "${lines[r]}" "$domain"
 
   # mark the word as used in the word list
   case $OSTYPE in
