@@ -11,7 +11,7 @@ readonly domain='example.com'
 
 # returns random number from 0 to ($1-1) in global var 'r'.
 rand() {
-  local max=$((32768 / $1 * $1))
+  local max=$(( 32768 / $1 * $1 ))
   while (( (r=$RANDOM) >= max )); do :; done
   r=$(( r % $1 ))
 }
@@ -28,11 +28,12 @@ else
   fi
 fi
 
-# read the word list into memory, removing commented words
+# read the word list into memory, removing commented words;
+# then remove the trailing empty element, if any:
+#    http://mywiki.wooledge.org/BashFAQ/005#Handling_newlines_.28or_lack_thereof.29_at_the_end_of_a_file
 unset lines n
 while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
-# since $n gets incremented even by the EOF character, remove 1 from n
-n=$(( n - 1 ))
+[[ ${lines[n-1]} ]] || unset -v 'lines[--n]'
 
 # output the random hostname(s)
 for i in $(seq $1); do
@@ -43,24 +44,16 @@ for i in $(seq $1); do
   # mark the word as used in the word list
   case $OSTYPE in
     darwin*)
-      sed -i '' "/^${lines[r]}\$ s/^/#/" "$wordlist"
+      sed -i '' "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
       ;;
     linux*)
-      sed -i "/^${lines[r]}\$/ s/^/#/" "$wordlist"
+      sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
       ;;
   esac
 
-  # filter the word list to avoid outputting the same hostname twice in one
-  # session
-  m=0
-  unset lines_new
-  for (( j = 0 ; j < n ; j++)); do
-    if [ $j -ne $r ]; then
-      lines_new[$((m++))]=${lines[j]}
-    fi
-  done
-  lines=("${lines_new[@]}")
-  n=$m
+  # remove the used word from the array to prevent duplicates
+  lines=(${lines[@]:0:$r} ${lines[@]:$(( $r + 1 ))})
+  n=$(( n - 1 ))
 done
 
 exit 0
