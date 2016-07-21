@@ -54,6 +54,9 @@ for i in $(seq $1); do
     linux*)
       sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
       ;;
+    msys*)
+      sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+      ;;
   esac
 
   # remove the used word from the array to prevent duplicates
