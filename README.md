@@ -31,9 +31,9 @@ pool, thereby uncommenting it in the wordlist:
 You can also print a list of the hostnames currently marked as in use:
 
     $ ./genhost ?
-    romeo.example.com
-    holiday.example.com
-    spiral.example.com
+    romeo
+    holiday
+    spiral
 
 For collaboration purposes, don't forget to commit the updated word list
 back to a shared Git repository so names do not get reused:
