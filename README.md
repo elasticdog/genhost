@@ -12,7 +12,7 @@ Usage
 Just run the script and provide the number of hostnames you'd like to
 generate:
 
-    $ ./genhost +4
+    $ ./genhost add 4
     romeo.example.com
     holiday.example.com
     jester.example.com
@@ -26,11 +26,11 @@ potential to be confusing based on technical jargon (like
 If you decommission a server, you can return its hostname to the usable
 pool, thereby uncommenting it in the wordlist:
 
-    $ ./genhost -jester
+    $ ./genhost del jester
 
 You can also print a list of the hostnames currently marked as in use:
 
-    $ ./genhost ?
+    $ ./genhost list
     romeo
     holiday
     spiral

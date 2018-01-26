@@ -19,12 +19,12 @@ rand() {
 # check for a positive integer argument
 if [[ -z $1 ]]; then
   printf 'Usage:\n'
-  printf '  genhost +<integer>\n    Generate hostnames by randomly picking unused names from the wordlist\n'
-  printf '  genhost -<hostname>\n    Return a decommissioned hostname to the available pool\n'
-  printf '  genhost ?\n    Print a list of all hostnames currently in use\n'
+  printf '  genhost add <integer>\n    Generate hostnames by randomly picking unused names from the wordlist\n'
+  printf '  genhost del <hostname>\n    Return a decommissioned hostname to the available pool\n'
+  printf '  genhost list\n    Print a list of all hostnames currently in use\n'
   exit 1
 else
-  if [[ $1 == +[0-9]* ]]; then
+  if [[ $1 == "add" ]] && [[ $2 == [0-9]* ]]; then
     # read the word list into memory, removing commented words;
     # then remove the trailing empty element, if any:
     #    http://mywiki.wooledge.org/BashFAQ/005#Handling_newlines_.28or_lack_thereof.29_at_the_end_of_a_file
@@ -33,7 +33,7 @@ else
       [[ ${lines[n-1]} ]] || unset -v 'lines[--n]'
 
     # output the random hostname(s)
-    for i in $(seq $1); do
+    for i in $(seq $2); do
       if [[ $n -eq 0 ]]; then
         printf 'genhost: no more available hostnames left in file %s\n' "$wordlist" >&2
         exit 1
@@ -60,10 +60,8 @@ else
       lines=(${lines[@]:0:$r} ${lines[@]:$(( $r + 1 ))})
       n=$(( n - 1 ))
     done
-    exit 0 
-  elif [[ $1 == -[A-Za-z]* ]]; then
-    # strip the leading dash
-    token=$(echo $1 | tail -c +2)
+  elif [[ $1 == "del" ]] && [[ $2 == [A-Za-z]* ]]; then
+    token=${2#-}
     # find it in the wordlist and uncomment if it's there
     case $OSTYPE in
       darwin*)
@@ -76,9 +74,8 @@ else
         sed -i "s/#$token/$token/" "$wordlist"
         ;;
     esac
-  elif [[ $1 == \? ]]; then
+  elif [[ $1 == "list" ]]; then
     grep "#" wordlist | sed 's/#//'
-    exit 0
   else
     printf 'genhost: invalid input\n' >&2
     exit 1
