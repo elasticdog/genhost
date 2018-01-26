@@ -26,11 +26,14 @@ potential to be confusing based on technical jargon (like
 If you decommission a server, you can return its hostname to the usable
 pool, thereby uncommenting it in the wordlist:
 
-    $ ./genhost -hostname
+    $ ./genhost -jester
 
 You can also print a list of the hostnames currently marked as in use:
 
     $ ./genhost ?
+    romeo.example.com
+    holiday.example.com
+    spiral.example.com
 
 For collaboration purposes, don't forget to commit the updated word list
 back to a shared Git repository so names do not get reused:
