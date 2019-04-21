@@ -18,50 +18,68 @@ rand() {
 
 # check for a positive integer argument
 if [[ -z $1 ]]; then
-  printf 'Usage: genhost <integer>\n'
-  printf 'Generate unused hostnames by randomly picking from a word list\n'
+  printf 'Usage:\n'
+  printf '  genhost <integer>\n    Generate hostnames by randomly picking unused names from the wordlist\n'
+  printf '  genhost reuse <hostname>\n    Return a decommissioned hostname to the available pool\n'
+  printf '  genhost list\n    Print a list of all hostnames currently in use\n'
   exit 1
 else
-  if [[ $1 == *[!0-9]* ]]; then
-    printf 'genhost: "%d" is not a positive integer\n' "$1" >&2
+  if [[ $1 == [0-9]* ]]; then
+    # read the word list into memory, removing commented words;
+    # then remove the trailing empty element, if any:
+    #    http://mywiki.wooledge.org/BashFAQ/005#Handling_newlines_.28or_lack_thereof.29_at_the_end_of_a_file
+    unset lines n
+    while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
+      [[ ${lines[n-1]} ]] || unset -v 'lines[--n]'
+
+    # output the random hostname(s)
+    for i in $(seq $1); do
+      if [[ $n -eq 0 ]]; then
+        printf 'genhost: no more available hostnames left in file %s\n' "$wordlist" >&2
+        exit 1
+      fi
+
+      # pick a random available word
+      rand $n
+      printf '%s.%s\n' "${lines[r]}" "$domain"
+
+      # mark the word as used in the word list
+      case $OSTYPE in
+        darwin*)
+          sed -i '' "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+          ;;
+        linux*)
+          sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+          ;;
+        msys*)
+          sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+          ;;
+      esac
+
+      # remove the used word from the array to prevent duplicates
+      lines=(${lines[@]:0:$r} ${lines[@]:$(( $r + 1 ))})
+      n=$(( n - 1 ))
+    done
+  elif [[ $1 == "reuse" ]] && [[ $2 == [A-Za-z]* ]]; then
+    token=${2#-}
+    # find it in the wordlist and uncomment if it's there
+    case $OSTYPE in
+      darwin*)
+        sed -i '' "s/#$token/$token/" "$wordlist"
+        ;;
+      linux*)
+        sed -i "s/#$token/$token/" "$wordlist"
+        ;;
+      msys*)
+        sed -i "s/#$token/$token/" "$wordlist"
+        ;;
+    esac
+  elif [[ $1 == "list" ]]; then
+    grep "#" wordlist | sed 's/#//'
+  else
+    printf 'genhost: invalid input\n' >&2
     exit 1
   fi
 fi
-
-# read the word list into memory, removing commented words;
-# then remove the trailing empty element, if any:
-#    http://mywiki.wooledge.org/BashFAQ/005#Handling_newlines_.28or_lack_thereof.29_at_the_end_of_a_file
-unset lines n
-while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
-[[ ${lines[n-1]} ]] || unset -v 'lines[--n]'
-
-# output the random hostname(s)
-for i in $(seq $1); do
-  if [[ $n -eq 0 ]]; then
-    printf 'genhost: no more available hostnames left in file %s\n' "$wordlist" >&2
-    exit 1
-  fi
-
-  # pick a random available word
-  rand $n
-  printf '%s.%s\n' "${lines[r]}" "$domain"
-
-  # mark the word as used in the word list
-  case $OSTYPE in
-    darwin*)
-      sed -i '' "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-      ;;
-    linux*)
-      sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-      ;;
-    msys*)
-      sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-      ;;
-  esac
-
-  # remove the used word from the array to prevent duplicates
-  lines=(${lines[@]:0:$r} ${lines[@]:$(( $r + 1 ))})
-  n=$(( n - 1 ))
-done
 
 exit 0

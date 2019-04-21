@@ -12,7 +12,7 @@ Usage
 Just run the script and provide the number of hostnames you'd like to
 generate:
 
-    $ ./genhost 4
+    $ ./genhost add 4
     romeo.example.com
     holiday.example.com
     jester.example.com
@@ -22,6 +22,18 @@ All of those words will automatically be commented out in the word list
 and thus removed from the pool of future names. If a hostname has the
 potential to be confusing based on technical jargon (like
 `email.example.com`), simply ignore it and generate a replacement.
+
+If you decommission a server, you can return its hostname to the usable
+pool, thereby uncommenting it in the wordlist:
+
+    $ ./genhost del jester
+
+You can also print a list of the hostnames currently marked as in use:
+
+    $ ./genhost list
+    romeo
+    holiday
+    spiral
 
 For collaboration purposes, don't forget to commit the updated word list
 back to a shared Git repository so names do not get reused:
