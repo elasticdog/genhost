@@ -30,7 +30,7 @@ else
 		#    http://mywiki.wooledge.org/BashFAQ/005#Handling_newlines_.28or_lack_thereof.29_at_the_end_of_a_file
 		unset lines n
 		while IFS= read -r 'lines[n++]'; do :; done < <(sed '/^#/d' "$wordlist")
-		[[ ${lines[n-1]} ]] || unset -v 'lines[--n]'
+		[[ ${lines[n - 1]} ]] || unset -v 'lines[--n]'
 
 		# output the random hostname(s)
 		for _ in $(seq "$1"); do
@@ -45,15 +45,15 @@ else
 
 			# mark the word as used in the word list
 			case $OSTYPE in
-				darwin*)
-					sed -i '' "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-					;;
-				linux*)
-					sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-					;;
-				msys*)
-					sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
-					;;
+			darwin*)
+				sed -i '' "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+				;;
+			linux*)
+				sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+				;;
+			msys*)
+				sed -i "s/^${lines[r]}\$/#${lines[r]}/" "$wordlist"
+				;;
 			esac
 
 			# remove the used word from the array to prevent duplicates
@@ -64,15 +64,15 @@ else
 		token=${2#-}
 		# find it in the wordlist and uncomment if it's there
 		case $OSTYPE in
-			darwin*)
-				sed -i '' "s/#$token/$token/" "$wordlist"
-				;;
-			linux*)
-				sed -i "s/#$token/$token/" "$wordlist"
-				;;
-			msys*)
-				sed -i "s/#$token/$token/" "$wordlist"
-				;;
+		darwin*)
+			sed -i '' "s/#$token/$token/" "$wordlist"
+			;;
+		linux*)
+			sed -i "s/#$token/$token/" "$wordlist"
+			;;
+		msys*)
+			sed -i "s/#$token/$token/" "$wordlist"
+			;;
 		esac
 	elif [[ $1 == "list" ]]; then
 		grep "#" wordlist | sed 's/#//'
