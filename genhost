@@ -4,8 +4,19 @@
 # genhost - generate unused hostnames by randomly picking from a word list
 #
 
-readonly wordlist='wordlist'
+# script path variables
+readonly script=$(realpath $0)
+readonly script_name=$(basename $script)
+readonly script_dir=$(dirname $script)
+
+readonly wordlist=${GENHOST_WORDLIST:-wordlist}
 readonly domain=${GENHOST_DOMAIN:-example.com}
+
+# validate path to word list file
+if [[ "$wordlist" == *".."* ]] || [ "$(basename $wordlist)" == "$script_name" ]; then
+    printf 'genhost: invalid word list file: %s\n' $wordlist
+    exit 1
+fi
 
 # http://mywiki.wooledge.org/BashFAQ/026
 
@@ -75,7 +86,7 @@ else
 			;;
 		esac
 	elif [[ $1 == "list" ]]; then
-		grep "#" wordlist | sed 's/#//'
+		grep "#" "$wordlist" | sed 's/#//'
 	else
 		printf 'genhost: invalid input\n' >&2
 		exit 1

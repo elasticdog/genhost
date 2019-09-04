@@ -40,3 +40,19 @@ a shared Git repository so names do not get reused:
     $ git add wordlist
     $ git commit
     $ git push
+
+### Environment Variables
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `GENHOST_DOMAIN` | The domain name to append to generated hostnames | example.com |
+| `GENHOST_WORDLIST` | Filename of the word list to use, relative to genhost directory | wordlist |
+
+    $ export GENHOST_DOMAIN=github.com
+    $ ./genhost 3
+    cover.github.com
+    kilo.github.com
+    open.github.com
+
+    $ export GENHOST_WORDLIST=colors.txt
+    $ ./genhost 1
+    yellow.github.com
