@@ -75,7 +75,7 @@ else
 			;;
 		esac
 	elif [[ $1 == "list" ]]; then
-		grep "#" wordlist | sed 's/#//'
+		grep "#" "$wordlist" | sed 's/#//'
 	else
 		printf 'genhost: invalid input\n' >&2
 		exit 1
